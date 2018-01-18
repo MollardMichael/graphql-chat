@@ -4,6 +4,7 @@ const ChannelManager = require('../services/ChannelManager.js');
 const MessageManager = require('../services/MessageManager.js');
 
 const {
+  GraphQLInputObjectType,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
@@ -12,8 +13,6 @@ const {
   GraphQLNonNull,
   GraphQLID
 } = require('graphql');
-
-console.log(UserManager.fetchAllUsers());
 
 const UserType = new GraphQLObjectType({
   name: 'User',
@@ -31,13 +30,25 @@ const UserType = new GraphQLObjectType({
   })
 });
 
+const UserInputType = new GraphQLInputObjectType({
+  name: 'UserInput',
+  description: 'A user informations',
+  fields: () => ({
+    firstName: {type: GraphQLString},
+    lastName: {type: GraphQLString},
+    email: {type: GraphQLString},
+    username: {type: GraphQLString},
+  })
+});
+
 const Channel = new GraphQLObjectType({
   name: "Channel",
   description: "A channel that can be used to exchange messages",
   fields: () => ({
     name: {type: GraphQLString},
     users: {
-      type: new GraphQLList(UserType)
+      type: new GraphQLList(UserType),
+      resolve: UserManager.getUserInChannel
     },
     messages: {
       type: new GraphQLList(Message),
@@ -51,8 +62,14 @@ const Message = new GraphQLObjectType({
   description: 'A message',
   fields: () => ({
     content: {type: GraphQLString},
-    user: {type: UserType},
-    channel: {type: Channel},
+    user: {
+      type: UserType,
+      resolve: UserManager.fetchUserByMessage
+    },
+    channel: {
+      type: Channel,
+      resolve: (message) => ChannelManager.fetchChannel(message.channel)
+    },
     date: {type: GraphQLString}
   })
 });
@@ -83,10 +100,27 @@ const QueryType = new GraphQLObjectType({
       })
 });
 
+const MutationType = new GraphQLObjectType({
+      name: 'Mutation',
+      description: 'The root of all Mutation',
+      fields: () => ({
+        registerUser: {
+          type: UserType,
+          args: {
+            user: {
+              type: new GraphQLNonNull(UserInputType)
+            }
+          },
+          resolve: (parent, {user}) => UserManager.registerUser(user)
+        }
+      })
+});
+
 
 exports.default = graphqlHTTP({
   schema: new GraphQLSchema({
     query: QueryType,
+    mutation: MutationType
   }),
   graphiql: true,
 });

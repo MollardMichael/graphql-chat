@@ -7,7 +7,7 @@ channels = [
   {
     "id": 2,
     "name": "The Jelly Channel",
-    "users": [4,5]
+    "users": [1,3]
   },
   {
     "id": 3,
@@ -19,6 +19,13 @@ channels = [
 class ChannelManager {
   constructor() {
   }
+
+  fetchChannel(id) {
+    return channels.filter((o) => {
+      return o.id == id;
+    })[0];
+  }
+
 
   fetchChannels(userId) {
     return channels.filter((o) => {

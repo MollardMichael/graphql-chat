@@ -4,6 +4,30 @@ messages = [
     "user": 1,
     "channel": 3,
     "date": ""
+  },
+  {
+    "content": "Hey !",
+    "user": 1,
+    "channel": 1,
+    "date": ""
+  },
+  {
+    "content": "How are you ?",
+    "user": 2,
+    "channel": 1,
+    "date": ""
+  },
+  {
+    "content": "I'm tripping !",
+    "user": 1,
+    "channel": 1,
+    "date": ""
+  },
+  {
+    "content": "Aww",
+    "user": 2,
+    "channel": 1,
+    "date": ""
   }
 ];
 
